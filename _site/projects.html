@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Projects</title>
+        <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="./css/syntax.css" />
+        <link rel="stylesheet" href="./css/default.css" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="top-container">
+                <header>
+                    <span class="logo">
+                        <a href="./">Haxkell</a>
+                    </span>
+                    <nav>
+                        <a class="nav-link" href="./contact.html">Contact</a>
+                        <a class="nav-link" href="./projects.html">Projects</a>
+                    </nav>
+                </header>
+                <h1>Projects</h1>
+
+                
+                <div id="datetags">
+                    
+
+                    
+                </div>
+            </div>
+
+            <main role="main">
+                <h2 id="haskell-ctf-crypto">Haskell CTF Crypto</h2>
+<p>This is an attempt to create an environment for doing CTF challenges in Haskell. Currently, it contains a set of abstract algebraic types and number-theoretic algorithms which are a first attempt to emulate the functionality of <a href="https://www.sagemath.org">SageMath</a>, and a small set of cryptographic algorithms and types which are a first attempt to emulate <a href="https://www.sagemath.org">PyCryptoDome</a>.</p>
+<p>It is definitely not worthy of proper use just yet, with the following things needing to be done in order to truly get some use from it:</p>
+<ul>
+<li>Separate the desired functionality into three libraries:
+<ul>
+<li>One for handling abstract/linear algebra and common number-theoretic algorithms. Similar to <code>SageMath</code>.</li>
+<li>One for integrating the types from the previous library into existing cryptography libraries such as <code>Cryptonite</code>.</li>
+<li>One for abstracting away most of the IO for running a program or connecting to a socket, supplying input and reading output. An example of something like this is <code>pwntools</code>.</li>
+</ul></li>
+</ul>
+            </main>
+
+
+            <div id="footer">
+                <div class="copyright">&copy; Timothy Copeland 2022</div>
+            </div>
+        </div>
+
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

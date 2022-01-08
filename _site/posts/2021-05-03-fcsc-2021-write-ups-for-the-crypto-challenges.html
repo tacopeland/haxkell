@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>FCSC 2021 - Write-Ups for the crypto challenges.</title>
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="../css/syntax.css" />
+        <link rel="stylesheet" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="top-container">
+                <header>
+                    <span class="logo">
+                        <a href="../">Haxkell</a>
+                    </span>
+                    <nav>
+                        <a class="nav-link" href="../contact.html">Contact</a>
+                        <a class="nav-link" href="../projects.html">Projects</a>
+                    </nav>
+                </header>
+                <h1>FCSC 2021 - Write-Ups for the crypto challenges.</h1>
+
+                
+                <div id="datetags">
+                    
+                    <span id="date">May  3, 2021</span>
+                    
+
+                    
+                    | <span id="tags"><a href="../tags/write-ups.html">write-ups</a>, <a href="../tags/crypto.html">crypto</a></span>
+                    
+                </div>
+            </div>
+
+            <main role="main">
+                <article>
+    <section>
+        <p>In this post, I’ll present my write-ups for all the challenges listed in the “Crypto” category, in the order I solved them during the competition.</p>
+<p>The challenges are:</p>
+<ol type="1">
+<li><a href="#macaque-50-points">Macaque – 50 points</a></li>
+<li><a href="#rsa-destroyer-200-points">RSA Destroyer – 200 points</a></li>
+<li><a href="#lost-curve-200-points">Lost curve – 200 points</a></li>
+<li><a href="#hashy-parmentier-200-points">Hashy Parmentier – 200 points</a></li>
+<li><a href="#revaulting-500-points">Revaulting – 500 points</a></li>
+<li><a href="#smealog-500-points">SmeaLog – 500 points</a></li>
+<li><a href="#trappy-skippy-500-points">Trappy Skippy – 500 points</a></li>
+</ol>
+<!--more-->
+<h2 id="macaque-50-points">MACAQUE – 50 POINTS</h2>
+<h3 id="description">DESCRIPTION</h3>
+<pre><code>Retrouvez le flag avec l'accès à ce service distant.
+
+nc challenges1.france-cybersecurity-challenge.fr 6000</code></pre>
+<p>The service’s source code was provided:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">#!/usr/bin/env python3</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> os </span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="im">from</span> Crypto.Cipher <span class="im">import</span> AES</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="im">from</span> Crypto.Util.Padding <span class="im">import</span> pad</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="im">from</span> flag <span class="im">import</span> flag</span>
+<span id="cb2-6"><a href="#cb2-6"></a>​</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="kw">class</span> Macaque():</span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, k1, k2):</span>
+<span id="cb2-9"><a href="#cb2-9"></a>        <span class="va">self</span>.k1 <span class="op">=</span> k1</span>
+<span id="cb2-10"><a href="#cb2-10"></a>        <span class="va">self</span>.k2 <span class="op">=</span> k2</span>
+<span id="cb2-11"><a href="#cb2-11"></a>        <span class="va">self</span>.bs <span class="op">=</span> AES.block_size</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        <span class="va">self</span>.zero <span class="op">=</span> b<span class="st">&quot;</span><span class="ch">\x00</span><span class="st">&quot;</span> <span class="op">*</span> <span class="va">self</span>.bs</span>
+<span id="cb2-13"><a href="#cb2-13"></a></span>
+<span id="cb2-14"><a href="#cb2-14"></a>    <span class="kw">def</span> tag(<span class="va">self</span>, m):</span>
+<span id="cb2-15"><a href="#cb2-15"></a>        m <span class="op">=</span> pad(m, <span class="va">self</span>.bs)</span>
+<span id="cb2-16"><a href="#cb2-16"></a>        c1 <span class="op">=</span> AES.new(<span class="va">self</span>.k1, AES.MODE_CBC, iv <span class="op">=</span> <span class="va">self</span>.zero).encrypt(m)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>        c2 <span class="op">=</span> AES.new(<span class="va">self</span>.k2, AES.MODE_CBC, iv <span class="op">=</span> <span class="va">self</span>.zero).encrypt(m)</span>
+<span id="cb2-18"><a href="#cb2-18"></a>        <span class="cf">return</span> c1[<span class="op">-</span><span class="va">self</span>.bs:] <span class="op">+</span> c2[<span class="op">-</span><span class="va">self</span>.bs:]</span>
+<span id="cb2-19"><a href="#cb2-19"></a></span>
+<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">def</span> verify(<span class="va">self</span>, m, tag):</span>
+<span id="cb2-21"><a href="#cb2-21"></a>        <span class="cf">return</span> <span class="va">self</span>.tag(m) <span class="op">==</span> tag</span>
+<span id="cb2-22"><a href="#cb2-22"></a></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="kw">def</span> usage():</span>
+<span id="cb2-24"><a href="#cb2-24"></a>    <span class="bu">print</span>(<span class="st">&quot;Commands are:&quot;</span>)</span>
+<span id="cb2-25"><a href="#cb2-25"></a>    <span class="bu">print</span>(<span class="st">&quot;|-&gt; t: Authenticate a message&quot;</span>)</span>
+<span id="cb2-26"><a href="#cb2-26"></a>    <span class="bu">print</span>(<span class="st">&quot;|-&gt; v: Verify a couple (message, tag)&quot;</span>)</span>
+<span id="cb2-27"><a href="#cb2-27"></a>    <span class="bu">print</span>(<span class="st">&quot;|-&gt; q: Quit&quot;</span>)</span>
+<span id="cb2-28"><a href="#cb2-28"></a></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-30"><a href="#cb2-30"></a></span>
+<span id="cb2-31"><a href="#cb2-31"></a>    S <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb2-32"><a href="#cb2-32"></a>    singe <span class="op">=</span> Macaque(os.urandom(<span class="dv">16</span>), os.urandom(<span class="dv">16</span>))</span>
+<span id="cb2-33"><a href="#cb2-33"></a></span>
+<span id="cb2-34"><a href="#cb2-34"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-35"><a href="#cb2-35"></a>        usage()</span>
+<span id="cb2-36"><a href="#cb2-36"></a>        cmd <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;&gt;&gt;&gt; &quot;</span>)</span>
+<span id="cb2-37"><a href="#cb2-37"></a></span>
+<span id="cb2-38"><a href="#cb2-38"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="bu">len</span>(cmd):</span>
+<span id="cb2-39"><a href="#cb2-39"></a>            exit(<span class="dv">1</span>)</span>
+<span id="cb2-40"><a href="#cb2-40"></a></span>
+<span id="cb2-41"><a href="#cb2-41"></a>        <span class="cf">if</span> cmd <span class="kw">not</span> <span class="kw">in</span> [<span class="st">'t'</span>, <span class="st">'v'</span>, <span class="st">'q'</span>]:</span>
+<span id="cb2-42"><a href="#cb2-42"></a>            usage()</span>
+<span id="cb2-43"><a href="#cb2-43"></a>            <span class="cf">continue</span></span>
+<span id="cb2-44"><a href="#cb2-44"></a></span>
+<span id="cb2-45"><a href="#cb2-45"></a>        <span class="cf">if</span> cmd <span class="op">==</span> <span class="st">'q'</span>:</span>
+<span id="cb2-46"><a href="#cb2-46"></a>            exit(<span class="dv">0</span>)</span>
+<span id="cb2-47"><a href="#cb2-47"></a></span>
+<span id="cb2-48"><a href="#cb2-48"></a>        <span class="cf">if</span> cmd <span class="op">==</span> <span class="st">'t'</span>:</span>
+<span id="cb2-49"><a href="#cb2-49"></a>            <span class="cf">if</span> <span class="bu">len</span>(S) <span class="op">&lt;</span> <span class="dv">3</span>:</span>
+<span id="cb2-50"><a href="#cb2-50"></a></span>
+<span id="cb2-51"><a href="#cb2-51"></a>                <span class="bu">print</span>(<span class="st">&quot;Message (hex):&quot;</span>)</span>
+<span id="cb2-52"><a href="#cb2-52"></a>                message <span class="op">=</span> <span class="bu">bytes</span>.fromhex(<span class="bu">input</span>(<span class="st">&quot;&gt;&gt;&gt; &quot;</span>))</span>
+<span id="cb2-53"><a href="#cb2-53"></a>                <span class="cf">if</span> <span class="kw">not</span> <span class="bu">len</span>(message):</span>
+<span id="cb2-54"><a href="#cb2-54"></a>                    exit(<span class="dv">1</span>)</span>
+<span id="cb2-55"><a href="#cb2-55"></a></span>
+<span id="cb2-56"><a href="#cb2-56"></a>                tag <span class="op">=</span> singe.tag(message)</span>
+<span id="cb2-57"><a href="#cb2-57"></a>                <span class="bu">print</span>(<span class="ss">f&quot;Tag (hex): </span><span class="sc">{</span>tag<span class="sc">.</span><span class="bu">hex</span>()<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-58"><a href="#cb2-58"></a>                S.add(message)</span>
+<span id="cb2-59"><a href="#cb2-59"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-60"><a href="#cb2-60"></a>                <span class="bu">print</span>(<span class="st">&quot;Error: you cannot use this command anymore.&quot;</span>)</span>
+<span id="cb2-61"><a href="#cb2-61"></a></span>
+<span id="cb2-62"><a href="#cb2-62"></a>        <span class="cf">elif</span> cmd <span class="op">==</span> <span class="st">'v'</span>:</span>
+<span id="cb2-63"><a href="#cb2-63"></a>            <span class="bu">print</span>(<span class="st">&quot;Message (hex):&quot;</span>)</span>
+<span id="cb2-64"><a href="#cb2-64"></a>            message <span class="op">=</span> <span class="bu">bytes</span>.fromhex(<span class="bu">input</span>(<span class="st">&quot;&gt;&gt;&gt; &quot;</span>))</span>
+<span id="cb2-65"><a href="#cb2-65"></a></span>
+<span id="cb2-66"><a href="#cb2-66"></a>            <span class="bu">print</span>(<span class="st">&quot;Tag (hex):&quot;</span>)</span>
+<span id="cb2-67"><a href="#cb2-67"></a>            tag <span class="op">=</span> <span class="bu">bytes</span>.fromhex(<span class="bu">input</span>(<span class="st">&quot;&gt;&gt;&gt; &quot;</span>))</span>
+<span id="cb2-68"><a href="#cb2-68"></a></span>
+<span id="cb2-69"><a href="#cb2-69"></a>            check <span class="op">=</span> singe.verify(message, tag)</span>
+<span id="cb2-70"><a href="#cb2-70"></a>            <span class="cf">if</span> check <span class="kw">and</span> message <span class="kw">not</span> <span class="kw">in</span> S:</span>
+<span id="cb2-71"><a href="#cb2-71"></a>                <span class="bu">print</span>(<span class="ss">f&quot;Congrats!! Here is the flag: </span><span class="sc">{</span>flag<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-72"><a href="#cb2-72"></a></span>
+<span id="cb2-73"><a href="#cb2-73"></a>            <span class="cf">elif</span> check <span class="kw">and</span> message <span class="kw">in</span> S:</span>
+<span id="cb2-74"><a href="#cb2-74"></a>                <span class="bu">print</span>(<span class="st">&quot;Valid!&quot;</span>)</span>
+<span id="cb2-75"><a href="#cb2-75"></a></span>
+<span id="cb2-76"><a href="#cb2-76"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-77"><a href="#cb2-77"></a>                <span class="bu">print</span>(<span class="st">&quot;Wrong tag. Try again.&quot;</span>)​</span></code></pre></div>
+<h3 id="resolution">RESOLUTION</h3>
+<p>The aim of the challenge is to provide a message with a valid tag, that was not generated by the service. We have to perform a forgery attack.</p>
+<p>By looking at how the Macaque class computes the tag, we see that it is composed of two parts:</p>
+<ol type="1">
+<li>The last block of the AES-CBC encryption of the message using an all zero IV and unknown key <span class="math inline"><em>k</em><sub>1</sub></span>;</li>
+<li>The last block of the AES-CBC encryption of the message using an all zero IV and unknown key <span class="math inline"><em>k</em><sub>2</sub></span>.</li>
+</ol>
+<p>Each part is actually an AES-CBC-MAC tag of the message with a different key.</p>
+<p>We can provide 3 messages of any length to the service. CBC-MAC is known to be weak against variable-length messages. The <a href="https://en.wikipedia.org/wiki/CBC-MAC#Security_with_fixed_and_variable-length_messages">wikipedia</a> article explains in detail why this is the case by showing how tag forgery can be achieved.</p>
+<p>Basically if we know a pair of messages and tags <span class="math inline">(<em>m</em>, <em>t</em>)</span> and <span class="math inline">(<em>m</em>′, <em>t</em>′)</span>, we can forge a message <span class="math inline"><em>m</em>″ = <em>m</em>||<em>m</em>′<sub>1</sub> ⊕ <em>t</em>||<em>m</em>′<sub>2</sub>||...||<em>m</em>′<sub><em>x</em></sub></span> (where <span class="math inline"><em>m</em>′<sub><em>x</em></sub></span> denotes the block <span class="math inline"><em>x</em></span> of <span class="math inline"><em>m</em>′</span>), whose tag will be <span class="math inline"><em>t</em>′</span>.</p>
+<p>We can apply the same technique on both parts of our tag individually to forge a new one.</p>
+    </section>
+</article>
+
+            </main>
+
+
+            <div id="footer">
+                <div class="copyright">&copy; Timothy Copeland 2022</div>
+            </div>
+        </div>
+
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

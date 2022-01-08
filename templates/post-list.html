@@ -1,0 +1,16 @@
+$for(posts)$
+    <hr />
+    <div class="post-list-entry">
+        <div class="list-entry-header">
+            <div class="list-tags">$tags$</div>
+            <h2 class="list-title"><a href="$url$">$title$</a></h2>
+            <span class="list-date">Posted on $date$</span>
+        </div>
+        <div class="list-teaser">
+            $if(teaser)$
+                $teaser$
+            $endif$
+        </div>
+        <a href="$url$">Read more →</a>
+    </div>
+$endfor$
