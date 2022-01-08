@@ -66,14 +66,14 @@ main = hakyllWith config $ do
         compile $ do
             posts <- recentFirst =<< loadAllSnapshots "posts/*" "content"
             let ogCtx =
+                    constField "root" "https://tacopeland.github.io/haxkell" `mappend`
+                    constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png" `mappend`
                     defaultContext
-                    <> constField "root" "https://tacopeland.github.io/haxkell"
-                    <> constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png"
-                indexCtx =
+            let indexCtx =
+                    listField "posts" (teaserCtxWithTags tags) (return posts) `mappend`
+                    openGraphField "opengraph" ogCtx `mappend`
+                    twitterCardField "twitter" ogCtx `mappend`
                     ogCtx
-                    <> listField "posts" (teaserCtxWithTags tags) (return posts)
-                    <> openGraphField "opengraph" ogCtx
-                    <> twitterCardField "twitter" ogCtx
 
             getResourceBody
                 >>= applyAsTemplate indexCtx
@@ -86,21 +86,21 @@ main = hakyllWith config $ do
 --------------------------------------------------------------------------------
 postCtx :: Context String
 postCtx =
+    dateField "date" "%B %e, %Y" `mappend`
+    constField "root" "https://tacopeland.github.io/haxkell" `mappend`
+    constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png" `mappend`
     defaultContext
-    <> constField "root" "https://tacopeland.github.io/haxkell/"
-    <> constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png"
-    <> dateField "date" "%B %e, %Y"
 
 teaserCtx :: Context String
 teaserCtx = teaserField "teaser" "content" `mappend` postCtx
 
 postCtxWithTags :: Tags -> Context String
 postCtxWithTags tags =
+    tagsField "tags" tags `mappend`
+    openGraphField "opengraph" postCtx `mappend`
+    twitterCardField "twitter" postCtx `mappend`
     postCtx
-    <> tagsField "tags" tags
-    <> openGraphField "opengraph" postCtx
-    <> twitterCardField "twitter" postCtx
 
 teaserCtxWithTags tags = 
+    tagsField "tags" tags `mappend`
     teaserCtx
-    <> tagsField "tags" tags
