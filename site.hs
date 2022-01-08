@@ -34,7 +34,7 @@ main = hakyllWith config $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll pattern
-            let ctx = constField "title" title `mappend` listField "posts" (postCtxWithTags tags) (return posts) `mappend` defaultContext
+            let ctx = constField "title" title `mappend` listField "posts" (teaserCtxWithTags tags) (return posts) `mappend` defaultContext
             makeItem "" >>= loadAndApplyTemplate "templates/tag.html" ctx >>= loadAndApplyTemplate "templates/default.html" ctx >>= relativizeUrls
 
     match "posts/*" $ do
