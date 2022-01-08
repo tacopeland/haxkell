@@ -65,9 +65,15 @@ main = hakyllWith config $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAllSnapshots "posts/*" "content"
-            let indexCtx =
-                    listField "posts" (teaserCtxWithTags tags) (return posts) `mappend`
+            let ogCtx =
                     defaultContext
+                    <> constField "root" "https://tacopeland.github.io/haxkell"
+                    <> constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png"
+                indexCtx =
+                    ogCtx
+                    <> listField "posts" (teaserCtxWithTags tags) (return posts)
+                    <> openGraphField "opengraph" ogCtx
+                    <> twitterCardField "twitter" ogCtx
 
             getResourceBody
                 >>= applyAsTemplate indexCtx
@@ -82,7 +88,7 @@ postCtx :: Context String
 postCtx =
     defaultContext
     <> constField "root" "https://tacopeland.github.io/haxkell/"
-    <> constField "og-image" "https://tacopeland.github.io/haxkell/assets/og-img.png"
+    <> constField "og-image" "https://tacopeland.github.io/haxkell/images/og-img.png"
     <> dateField "date" "%B %e, %Y"
 
 teaserCtx :: Context String
