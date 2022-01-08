@@ -1,6 +1,7 @@
 ---
 title: To-do List
 tags: misc
+og-description: The things I must do before deploying this site.
 ---
 
 This is a list of things that I will do before this blog can go into production:
@@ -14,5 +15,6 @@ This is a list of things that I will do before this blog can go into production:
   - [ ] Remove test articles.
 - [ ] Insert Disqs.
 - [ ] SEO pretty links.
+- [ ] Make it look better in CLI browsers.
 
 <!--more-->

@@ -80,15 +80,21 @@ main = hakyllWith config $ do
 --------------------------------------------------------------------------------
 postCtx :: Context String
 postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
     defaultContext
+    <> constField "root" "https://tacopeland.github.io/haxkell/"
+    <> constField "og-image" "https://tacopeland.github.io/haxkell/assets/og-img.png"
+    <> dateField "date" "%B %e, %Y"
 
 teaserCtx :: Context String
 teaserCtx = teaserField "teaser" "content" `mappend` postCtx
 
 postCtxWithTags :: Tags -> Context String
 postCtxWithTags tags =
-    tagsField "tags" tags `mappend` postCtx
+    postCtx
+    <> tagsField "tags" tags
+    <> openGraphField "opengraph" postCtx
+    <> twitterCardField "twitter" postCtx
 
 teaserCtxWithTags tags = 
-    tagsField "tags" tags `mappend` teaserCtx
+    teaserCtx
+    <> tagsField "tags" tags

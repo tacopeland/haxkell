@@ -1,0 +1,15 @@
+name: haxkell
+version: 0.1.0.0
+synopsis: A blog about doing CTF challenges in Haskell
+description: See README at <https://github.com/tacopeland/haxkell#readme>
+maintainer: Timothy Copeland <timcopeland1111@gmail.com>
+github: tacopeland/haxkell
+
+ghc-options: -threaded
+  
+dependencies:
+  - base == 4.*
+  - hakyll == 4.15.*
+
+executable:
+  main: site.hs
