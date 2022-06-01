@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>WIP Test Drive</title>
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="../css/syntax.css" />
+        <link rel="stylesheet" href="../css/default.css" />
+        <meta property="og:type" content="article" /><meta property="og:url" content="https://tacopeland.github.io/haxkell/posts/2022-06-01-wip-test-drive.html" /><meta property="og:title" content="WIP Test Drive" /><meta property="og:description" content="Test drive of my WIP Haskell library for solving CTF questions." /><meta property="og:image" content="https://tacopeland.github.io/haxkell/images/og-img.png" />
+        <meta name="twitter:card" content="summary" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="top-container">
+                <header>
+                    <span class="logo">
+                        <a href="../">Haxkell</a>
+                    </span>
+                    <nav>
+                        <a class="nav-link" href="../contact.html">Contact</a>
+                        <a class="nav-link" href="../projects.html">Projects</a>
+                    </nav>
+                </header>
+                <h1>WIP Test Drive</h1>
+
+                
+                <div id="datetags">
+                    
+                    <span id="date">June  1, 2022</span>
+                    
+
+                    
+                    | <span id="tags"><a title="All pages tagged 'write-ups'." href="../tags/write-ups.html">write-ups</a>, <a title="All pages tagged 'crypto'." href="../tags/crypto.html">crypto</a></span>
+                    
+                </div>
+            </div>
+
+            <main role="main">
+                <article>
+    <section>
+        <p>While working on my Haskell library, haskell-ctf-crypto, I have spent more time filling my todo-list than actually working on it. So, I have decided to make use of this library to solve crypto CTF challenges, in order to shed light on the shortcomings of this library and provide direction for further development.</p>
+<!--more-->
+<h1 id="stack">Stack</h1>
+<p>So, we’re off to solve some CTF challenges, right? Wrong.</p>
+<p>Here is where I hit my first snag: it is extremely painful to run a Haskell script using a library not on Hackage. To run a Stack script, the “accepted” method is to preface a Haskell script with a POSIX shebang pointing to Stack, with arguments specifying the resolver and packages to import. I could not do this, because my crypto library is not yet on the Hackage database. So, I had to forego Stack scripts altogether and simply create a new stack project for each CTF challenge, which is extremely annoying. To alleviate some of the annoyance and inelegance, I have created a minimal project template to use with <code>stack new</code> when creating a new challenge folder. The template is as follows: ## script.hsfiles</p>
+<pre><code>{-# START_FILE {{name}}.cabal #-}
+name: {{name}}
+version: 0
+build-type: Simple
+cabal-version: &gt;=1.10
+
+executable {{name}}
+  main-is: {{name}}.hs
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base ==4.*
+    , haskell-ctf-crypto
+  default-language: Haskell2010
+
+{-# START_FILE stack.yaml #-}
+resolver: lts-19.9
+packages:
+- .
+extra-deps:
+- github: tacopeland/haskell-ctf-crypto
+  commit: 91efa7220fe0ea35ef8d0d85fe4634073db3f3d8
+- github: gilith/factor
+  commit: 482b2eb792ab63a51f2c3a514cdfb0b76f9205a5
+
+{-# START_FILE {{name}}.hs #-}
+main :: IO ()
+main = do
+    print &quot;It works!&quot;
+</code></pre>
+<p>Even with this, I have 3 extra files plus 1 hidden folder <code>.stack-work</code> in every challenge folder.</p>
+<p>From what I gather, the need to get packages exclusively from the internet and not from the local filesystem is for the much-desired property of “reproducability”, which means something along the lines of “either EVERYBODY can run this script, or nobody can”. While this means anybody using Stack can run this script on any system Stack supports with just a <code>stack run</code> after downloading the folder, it creates extra files and makes the directory slightly messy. You win some, you lose some.</p>
+<h1 id="angstromctf-2021"><a href="https://2021.angstromctf.com">AngstromCTF 2021</a></h1>
+<p>I decided to start with AngstromCTF 2021. This is because it’s relatively easy, still accessible online, and has quality challenges. I will start from the easiest challenges and proceed to the harder ones.</p>
+<h2 id="relatively-simple-algorithm-40-points">Relatively Simple Algorithm (40 points)</h2>
+<p>This is an extremely easy RSA challenge, where you are given the modulus fully factored, along with the public exponent and ciphertext, and you simply need to decrypt the ciphertext after calculating the private key from the factored modulus. Here is the script:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Crypto.Util.Encoding</span> (integerToBytes)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="dt">Crypto.PublicKey.RSA</span> (constructFacE, decrypt)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>main <span class="ot">=</span> <span class="kw">let</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    n <span class="ot">=</span> <span class="dv">113138904645172037883970365829067951997230612719077573521906183509830180342554841790268134999423971247602095979484887092205889453631416247856139838680189062511282674134361726455828113825651055263796576482555849771303361415911103661873954509376979834006775895197929252775133737380642752081153063469135950168223</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">=</span> <span class="dv">11556895667671057477200219387242513875610589005594481832449286005570409920461121505578566298354611080750154513073654150580136639937876904687126793459819369</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    q <span class="ot">=</span> <span class="dv">9789731420840260962289569924638041579833494812169162102854947552459243338614590024836083625245719375467053459789947717068410632082598060778090631475194567</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    e <span class="ot">=</span> <span class="dv">65537</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    c <span class="ot">=</span> <span class="dv">108644851584756918977851425216398363307810002101894230112870917234519516101802838576315116490794790271121303531868519534061050530562981420826020638383979983010271660175506402389504477695184339442431370630019572693659580322499801215041535132565595864123113626239232420183378765229045037108065155299178074809432</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    key <span class="ot">=</span> constructFacE [p,q] e</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">Just</span> m <span class="ot">=</span> decrypt c key</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">in</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span> (integerToBytes m)</span></code></pre></div>
+<p>This was extremely easy, for a few reasons: - The RSA parameters given in a text file could be directly copied into the script, then indented. - The <code>constructFacE :: [Integer] -&gt; Integer -&gt; RSAKey</code> function constructs an RSA private key given factors and a public exponent, taking care of the calculation of <span class="math display"><em>ϕ</em> = (<em>p</em>−1)(<em>q</em>−1)</span> and <span class="math display"><em>e</em></span>.</p>
+    </section>
+</article>
+
+            </main>
+
+
+            <div id="footer">
+                <div class="copyright">&copy; Timothy Copeland 2022</div>
+            </div>
+        </div>
+
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>
